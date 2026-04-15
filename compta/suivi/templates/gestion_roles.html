@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINTECH - Gestion des Rôles</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #38bdf8;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text-main); }
+
+        /* NAVBAR */
+        header { background: var(--primary); color: white; padding: 0.8rem 1.5rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 900; font-size: 1.4rem; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 8px; }
+        .nav-links a { color: white; text-decoration: none; font-size: 0.8rem; padding: 8px 12px; border-radius: 6px; transition: 0.3s; background: rgba(255,255,255,0.05); }
+        .nav-links a:hover { background: var(--secondary); }
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 4px; }
+        .hamburger span { width: 22px; height: 2px; background: white; }
+
+        /* CONTENT */
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1rem; }
+        .page-header { margin-bottom: 2rem; }
+        .page-header h1 { font-size: 1.6rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .page-header p { color: var(--text-sub); font-size: 0.9rem; }
+
+        /* TABLEAU DES UTILISATEURS */
+        .card { background: var(--white); border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; text-align: left; padding: 15px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); border-bottom: 2px solid var(--border); }
+        td { padding: 15px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+        
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 35px; height: 35px; background: var(--secondary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem; }
+
+        /* FORMULAIRE DANS LE TABLEAU */
+        .role-form { display: flex; gap: 8px; align-items: center; }
+        select { padding: 8px 12px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; background: #fff; cursor: pointer; transition: 0.2s; }
+        select:focus { border-color: var(--secondary); }
+        
+        button { background: var(--primary); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.3s; }
+        button:hover { background: var(--secondary); transform: translateY(-1px); }
+
+        /* BADGES */
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; }
+        .badge-active { background: #dcfce7; color: #166534; }
+
+        @media (max-width: 700px) {
+            .hamburger { display: flex; }
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: var(--primary); padding: 1rem; }
+            .nav-links.active { display: flex; }
+            th:nth-child(2), td:nth-child(2) { display: none; } /* Cache le libellé fixe sur mobile */
+            .role-form { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">FINTECH</div>
+        <div id="hamb" class="hamburger"><span></span><span></span><span></span></div>
+        <nav class="nav-links" id="menu">
+            {% if user.is_cadre  %}
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'creer_utilisateur'%}">Créer un utilisateur</a>
+                <a href="{% url 'modifier_statut' user.id %}">Gestion des rôles</a>
+            {% endif %}
+        
+            <a href="{% url 'gestionstock' %}">Gestion stock</a>
+            
+           
+            {% if user.is_cadre or user.is_comptable %}
+                <a href="{% url 'rapport' %}">Rapport</a>
+                <a href="{% url 'dette' %}">Dette</a>
+                <a href="{% url 'detteinterne' %}">Dette interne</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <div class="page-header">
+        <h1>Gestion des Rôles</h1>
+        <p>Attribuez ou modifiez les privilèges d'accès des membres de votre équipe.</p>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Utilisateur</th>
+                    <th>Rôle Actuel</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in utilisateurs %}
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            <div class="avatar">{{ u.username|slice:":1"|upper }}</div>
+                            <strong>{{ u.username }}</strong>
+                        </div>
+                    </td>
+                    <td>
+                        {% if u.is_cadre %}<span class="badge badge-active">Cadre</span>
+                        {% elif u.is_comptable %}<span class="badge badge-active">Comptable</span>
+                        {% else %}<span class="badge badge-active">Vendeur</span>{% endif %}
+                    </td>
+                    <td>
+                        <form action="{% url 'modifier_statut' u.id %}" method="POST" class="role-form">
+                            {% csrf_token %}
+                            <select name="role">
+                                <option value="vendeur" {% if u.is_vendeur %}selected{% endif %}>Vendeur</option>
+                                <option value="comptable" {% if u.is_comptable %}selected{% endif %}>Comptable</option>
+                                <option value="cadre" {% if u.is_cadre %}selected{% endif %}>Cadre</option>
+                            </select>
+                            <button type="submit">Appliquer</button>
+                        </form>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-sub);">
+                        Aucun utilisateur enregistré.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Menu Mobile
+    const hamb = document.getElementById('hamb');
+    const menu = document.getElementById('menu');
+    hamb.addEventListener('click', () => menu.classList.toggle('active'));
+
+    // Feedback visuel au clic
+    document.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', function() {
+            this.innerText = 'Chargement...';
+            this.style.opacity = '0.7';
+        });
+    });
+</script>
+
+</body>
+</html>

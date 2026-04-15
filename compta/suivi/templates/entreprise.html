@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Créer une Entreprise et un Compte Administrateur</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        /* Carte principale */
+        .card {
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        .card-header {
+            background: #2563eb;
+            padding: 1.8rem 2rem;
+            color: white;
+        }
+
+        .card-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            line-height: 1.3;
+            margin: 0;
+        }
+
+        .card-body {
+            padding: 2rem;
+        }
+
+        /* Fieldset */
+        fieldset {
+            border: none;
+            margin-bottom: 1.8rem;
+            padding: 0;
+        }
+
+        legend {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1e466e;
+            margin-bottom: 1rem;
+            padding-bottom: 0.4rem;
+            border-bottom: 2px solid #e2e8f0;
+            width: 100%;
+        }
+
+        /* Champs de formulaire */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: #1e466e;
+            box-shadow: 0 0 0 3px rgba(30, 70, 110, 0.2);
+        }
+
+        /* Bouton */
+        button {
+            background: #1e466e;
+            color: white;
+            border: none;
+            padding: 0.9rem 1.8rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+
+        button:hover {
+            background: #0f2f4f;
+            transform: scale(1.01);
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        /* Messages */
+        .messages {
+            margin-top: 1.5rem;
+            list-style: none;
+            padding: 0;
+        }
+
+        .messages li {
+            padding: 0.9rem 1.2rem;
+            border-radius: 20px;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+        }
+
+        .messages .success {
+            background: #e0f2e9;
+            color: #1e6f4c;
+            border-left: 5px solid #2c9e6e;
+        }
+
+        .messages .error {
+            background: #ffe6e5;
+            color: #b91c1c;
+            border-left: 5px solid #e53e3e;
+        }
+
+        .messages .warning {
+            background: #fff3e0;
+            color: #b45309;
+            border-left: 5px solid #f59e0b;
+        }
+
+        .messages .info {
+            background: #e1f0fa;
+            color: #1e466e;
+            border-left: 5px solid #3b82f6;
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .card-header {
+                padding: 1.3rem 1.5rem;
+            }
+            .card-header h1 {
+                font-size: 1.4rem;
+            }
+            .card-body {
+                padding: 1.5rem;
+            }
+            input, select, button {
+                padding: 0.75rem 1rem;
+            }
+        }
+
+        /* Petite touche d'espacement */
+        hr {
+            margin: 1rem 0;
+            border: none;
+            border-top: 1px solid #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1>Créer une entreprise<br>et un compte administrateur</h1>
+        </div>
+        <div class="card-body">
+            <form method="post" novalidate>
+                {% csrf_token %}
+                <fieldset>
+                    <legend>🏢 Informations de l'entreprise</legend>
+                    <div class="form-group">
+                        <label for="id_nom_entreprise">Nom de l'entreprise</label>
+                        {{ form.nom_entreprise }}
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>👤 Création du compte administrateur</legend>
+                    <div class="form-group">
+                        <label for="id_username">Nom d'utilisateur</label>
+                        {{ form.username }}
+                     
+                    </div>
+                    <div class="form-group">
+                        <label for="id_email">Email</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password1">Mot de passe</label>
+                        {{ form.password1 }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_password2">Confirmer le mot de passe</label>
+                        {{ form.password2 }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_role">Rôle</label>
+                        {{ form.role }}
+                    </div>
+                </fieldset>
+
+                <button type="submit">
+                    ✨ Créer l'entreprise et le compte administrateur
+                </button>
+            </form>
+
+            {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                            {{ message }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

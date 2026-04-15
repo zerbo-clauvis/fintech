@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINTECH - Dettes Fournisseurs</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #38bdf8;
+            --bg: #f1f5f9;
+            --white: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text-main); }
+
+        /* NAVBAR */
+        header { background: var(--primary); color: white; padding: 1rem 1.5rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 900; font-size: 1.4rem; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 10px; }
+        .nav-links a { color: white; text-decoration: none; font-size: 0.85rem; padding: 8px 12px; border-radius: 6px; transition: 0.3s; }
+        .nav-links a:hover { background: var(--secondary); }
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 4px; }
+        .hamburger span { width: 22px; height: 2px; background: white; }
+
+        /* MESSAGES */
+        .messages { list-style: none; max-width: 1200px; margin: 1rem auto; padding: 0 1rem; }
+        .messages li { background: #dcfce7; color: #166534; padding: 12px; border-radius: 8px; border-left: 5px solid #10b981; }
+
+        /* LAYOUT & CARDS */
+        .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; }
+        .grid-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+        .card { background: var(--white); padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+        .card h2 { font-size: 1.1rem; color: var(--primary); margin-bottom: 1.2rem; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+
+        /* RECHERCHE */
+        .search-box { display: flex; gap: 10px; flex-grow: 1; max-width: 500px; }
+        input, select { width: 100%; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.95rem; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--secondary); }
+        .btn-reset { background: #94a3b8; color: white; border: none; padding: 0 15px; border-radius: 8px; cursor: pointer; }
+
+        /* FORMULAIRES */
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .input-group { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: var(--text-sub); }
+        button[type="submit"] { background: var(--primary); color: white; border: none; width: 100%; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button[type="submit"]:hover { background: var(--secondary); }
+
+        /* TABLEAU */
+        .table-responsive { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #f8fafc; text-align: left; padding: 15px; font-size: 0.8rem; color: var(--text-sub); text-transform: uppercase; }
+        td { padding: 15px; border-top: 1px solid var(--border); font-size: 0.95rem; }
+        tr:hover { background: #f8fafc; }
+        .reste-positif { color: #ef4444; font-weight: bold; }
+
+        @media (max-width: 850px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .hamburger { display: flex; }
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: var(--primary); padding: 1rem; }
+            .nav-links.active { display: flex; }
+            .grid-header { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">FINTECH</div>
+        <div class="hamburger" id="hamb"><span></span><span></span><span></span></div>
+        <nav class="nav-links" id="menu">
+            {% if user.is_cadre %}
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'creer_utilisateur'%}">Créer un utilisateur</a>
+                <a href="{% url 'modifier_statut' user.id %}">Gestion des rôles</a>
+            {% endif %}
+        
+            <a href="{% url 'gestionstock' %}">Gestion stock</a>
+            
+           
+            {% if user.is_cadre or user.is_comptable %}
+                <a href="{% url 'rapport' %}">Rapport</a>
+                <a href="{% url 'dette' %}">Dette</a>
+                <a href="{% url 'detteinterne' %}">Dette interne</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="grid-header">
+        <h1>Dettes Fournisseurs</h1>
+        <div class="search-box">
+            <input type="text" id="search_fournisseur" placeholder="Rechercher un fournisseur..." value="{{ search_query }}">
+            <button class="btn-reset" id="reset_search">X</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>Historique des Dettes</h2>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Fournisseur</th>
+                        <th>Libellé Dette</th>
+                        <th>Total</th>
+                        <th>Payé</th>
+                        <th>Restant</th>
+                    </tr>
+                </thead>
+                <tbody id="dette_table">
+                    {% for d in dettes %}
+                    <tr data-fournisseur="{{ d.nom_fournisseur.nom_fournisseur|lower }}">
+                        <td><strong>{{ d.nom_fournisseur.nom_fournisseur }}</strong></td>
+                        <td>{{ d.nom_dette }}</td>
+                        <td>{{ d.montant_dette }}</td>
+                        <td>{{ d.montant_paye }}</td>
+                        <td class="reste-positif">{{ d.montant_restant }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" style="text-align: center; padding: 2rem;">Aucune dette trouvée</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="form-grid">
+        <!-- CRÉATION -->
+        <div class="card">
+            <h2>📦 Créer une dette</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="create">
+                <div class="input-group">
+                    <label>Libellé dette</label>
+                    <input type="text" name="nom_dette" id="nom_dette" required>
+                </div>
+                <div class="input-group">
+                    <label>Fournisseur</label>
+                    <select name="nom_fournisseur" id="nom_fournisseur_select" required>
+                        <option value="">-- Choisir --</option>
+                        {% for f in fournisseurs %}
+                            <option value="{{ f.id }}">{{ f.nom_fournisseur }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <div class="input-group" style="flex: 1;">
+                        <label>Montant total</label>
+                        <input type="number" name="montant_dette" id="montant_dette" step="0.01" required>
+                    </div>
+                    <div class="input-group" style="flex: 1;">
+                        <label>Déjà payé</label>
+                        <input type="number" name="montant_paye" id="montant_paye" step="0.01" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Montant restant (calculé)</label>
+                    <input type="number" id="montant_restant" style="background: #f8fafc; font-weight: bold;" readonly>
+                </div>
+                <button type="submit">Créer la dette</button>
+            </form>
+        </div>
+
+        <!-- MISE A JOUR -->
+        <div class="card">
+            <h2>🔄 Mise à jour rapide</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="update">
+                <div class="input-group">
+                    <label>Nom exact de la dette</label>
+                    <input type="text" name="nom_dette_update" placeholder="Ex: Facture #102" required>
+                </div>
+                <div class="input-group">
+                    <label>Montant à ajouter au paiement</label>
+                    <input type="number" name="montant_paye_update" step="0.01" required>
+                </div>
+                <button type="submit" style="background: var(--secondary);">Mettre à jour</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Menu mobile
+    const hamb = document.getElementById('hamb');
+    const menu = document.getElementById('menu');
+    hamb.addEventListener('click', () => menu.classList.toggle('active'));
+
+    // Calcul automatique du reste
+    const md = document.getElementById('montant_dette');
+    const mp = document.getElementById('montant_paye');
+    const mr = document.getElementById('montant_restant');
+
+    function updateReste() {
+        const reste = (parseFloat(md.value) || 0) - (parseFloat(mp.value) || 0);
+        mr.value = Math.max(0, reste).toFixed(2);
+    }
+    md.addEventListener('input', updateReste);
+    mp.addEventListener('input', updateReste);
+
+    // Filtrage dynamique
+    const searchInput = document.getElementById('search_fournisseur');
+    const tableRows = document.querySelectorAll('#dette_table tr');
+
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        tableRows.forEach(row => {
+            const fName = row.dataset.fournisseur || '';
+            row.style.display = fName.includes(query) ? '' : 'none';
+        });
+    });
+
+    document.getElementById('reset_search').addEventListener('click', () => {
+        searchInput.value = '';
+        tableRows.forEach(row => row.style.display = '');
+    });
+</script>
+
+</body>
+</html>

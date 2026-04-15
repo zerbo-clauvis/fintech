@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINTECH - Rapport de Suivi</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #38bdf8;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.5; }
+
+        /* NAVBAR */
+        header { background: var(--primary); color: white; padding: 0.8rem 1.5rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 900; font-size: 1.4rem; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 8px; }
+        .nav-links a { color: white; text-decoration: none; font-size: 0.8rem; padding: 8px 12px; border-radius: 6px; transition: 0.3s; background: rgba(255,255,255,0.05); }
+        .nav-links a:hover { background: var(--secondary); }
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 4px; }
+        .hamburger span { width: 22px; height: 2px; background: white; }
+
+        /* CONTENT */
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        .report-header { margin-bottom: 2rem; }
+        .report-header h1 { font-size: 1.8rem; color: var(--primary); margin-bottom: 0.5rem; }
+
+        /* FILTRES */
+        .card-filters { background: var(--white); padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; border-top: 4px solid var(--secondary); }
+        .filter-form { display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: flex-end; }
+        .filter-group { display: flex; flex-direction: column; gap: 5px; min-width: 200px; }
+        label { font-size: 0.85rem; font-weight: 700; color: var(--text-sub); }
+        select, input { padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; }
+        .btn-show { background: var(--primary); color: white; border: none; padding: 10px 25px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; height: 41px; }
+        .btn-show:hover { background: var(--secondary); }
+
+        /* RESUMÉ CHIFFRES */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2.5rem; }
+        .kpi-card { background: white; padding: 1.5rem; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
+        .kpi-card span { display: block; font-size: 0.8rem; color: var(--text-sub); margin-bottom: 5px; font-weight: 600; }
+        .kpi-card strong { font-size: 1.25rem; color: var(--text-main); }
+        .kpi-card.result { background: var(--primary); color: white; }
+        .kpi-card.result span, .kpi-card.result strong { color: white; }
+
+        /* TABLEAUX */
+        .section-title { margin: 2rem 0 1rem; font-size: 1.2rem; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+        .table-container { background: white; border-radius: 12px; overflow-x: auto; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        th { background: #f8fafc; text-align: left; padding: 12px 15px; font-size: 0.75rem; color: var(--text-sub); text-transform: uppercase; border-bottom: 2px solid var(--border); }
+        td { padding: 12px 15px; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+        tr:last-child td { border-bottom: none; }
+        .text-danger { color: var(--danger); font-weight: bold; }
+        .text-success { color: var(--success); font-weight: bold; }
+
+        @media (max-width: 850px) {
+            .hamburger { display: flex; }
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: var(--primary); padding: 1rem; }
+            .nav-links.active { display: flex; }
+            .filter-form { flex-direction: column; align-items: stretch; }
+            .btn-show { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">FINTECH</div>
+        <div id="hamb" class="hamburger"><span></span><span></span><span></span></div>
+        <nav class="nav-links" id="menu">
+            {% if user.is_cadre  %}
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'creer_utilisateur'%}">Créer un utilisateur</a>
+                <a href="{% url 'modifier_statut' user.id %}">Gestion des rôles</a>
+            {% endif %}
+        
+            <a href="{% url 'gestionstock' %}">Gestion stock</a>
+            
+           
+            {% if user.is_cadre or user.is_comptable %}
+                <a href="{% url 'rapport' %}">Rapport</a>
+                <a href="{% url 'dette' %}">Dette</a>
+                <a href="{% url 'detteinterne' %}">Dette interne</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <div class="report-header">
+        <h1>Rapport de suivi</h1>
+        <p style="color: var(--text-sub)">Analyse des flux financiers par période</p>
+    </div>
+
+    <form method="get" action="">
+        <div class="card-filters">
+            <div class="filter-form">
+                <div class="filter-group">
+                    <label>Type de période</label>
+                    <select id="mode" name="mode" onchange="onModeChange()">
+                        <option value="jour" {% if mode == 'jour' %}selected{% endif %}>Journalier</option>
+                        <option value="mois" {% if mode == 'mois' %}selected{% endif %}>Mensuel</option>
+                    </select>
+                </div>
+
+                <div class="filter-group" id="date-journalier">
+                    <label>Sélectionner le jour</label>
+                    <input type="date" name="periode" value="{{ periode }}">
+                </div>
+
+                <div class="filter-group" id="date-mensuel" style="display: none;">
+                    <label>Sélectionner le mois</label>
+                    <input type="month" name="periode" value="{{ periode }}">
+                </div>
+
+                <button type="submit" class="btn-show">Afficher le rapport</button>
+            </div>
+        </div>
+    </form>
+
+    <h2 style="margin-bottom: 1rem; font-size: 1.1rem; color: var(--text-sub);">Résultats pour : <span style="color: var(--text-main);">{{ periode_label }}</span></h2>
+
+    <div class="summary-grid">
+        <div class="kpi-card"><span>Total Ventes</span><strong>{{ total_ventes }}</strong></div>
+        <div class="kpi-card"><span>Total Achats</span><strong>{{ total_achats }}</strong></div>
+        <div class="kpi-card"><span>Dettes Fourn.</span><strong class="text-danger">{{ total_dettes }}</strong></div>
+        <div class="kpi-card"><span>Dettes Int.</span><strong class="text-danger">{{ total_dettes_internes }}</strong></div>
+        <div class="kpi-card result"><span>Résultat Net</span><strong>{{ total_global }} CFA</strong></div>
+    </div>
+
+    <!-- SECTIONS TABLEAUX -->
+    <h3 class="section-title">🛒 Ventes de la période</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Produit</th><th>Quantité</th><th>Prix Unitaire</th><th>Total</th></tr>
+            </thead>
+            <tbody>
+                {% for vente in ventes %}
+                <tr>
+                    <td>{{ vente.date }}</td>
+                    <td><strong>{{ vente.produit.nom_produit }}</strong></td>
+                    <td>{{ vente.quantite_vendue }}</td>
+                    <td>{{ vente.prix_vente }}</td>
+                    <td class="text-success">{{ vente.total_vente|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" style="text-align:center; padding:20px;">Aucune vente enregistrée.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="section-title">📉 Achats / Dépenses</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Désignation</th><th>Budget</th><th>Montant</th></tr>
+            </thead>
+            <tbody>
+                {% for achat in achats %}
+                <tr>
+                    <td>{{ achat.date }}</td>
+                    <td><strong>{{ achat.nom_achat }}</strong></td>
+                    <td>{{ achat.budget.nom_budget }}</td>
+                    <td class="text-danger">{{ achat.prix_achat }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" style="text-align:center; padding:20px;">Aucun achat enregistré.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h3 class="section-title">🚩 Dettes Restantes</h3>
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Libellé</th><th>Fournisseur</th><th>Dette</th><th>Payé</th><th>Reste</th></tr>
+            </thead>
+            <tbody>
+                {% for dette in dettes %}
+                <tr>
+                    <td>{{ dette.date }}</td>
+                    <td>{{ dette.nom_dette }}</td>
+                    <td>{{ dette.nom_fournisseur.nom_fournisseur }}</td>
+                    <td>{{ dette.montant_dette }}</td>
+                    <td>{{ dette.montant_paye }}</td>
+                    <td class="text-danger">{{ dette.montant_restant }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" style="text-align:center; padding:20px;">Aucune dette fournisseur.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    function onModeChange() {
+        var mode = document.getElementById('mode').value;
+        document.getElementById('date-journalier').style.display = mode === 'jour' ? 'flex' : 'none';
+        document.getElementById('date-mensuel').style.display = mode === 'mois' ? 'flex' : 'none';
+    }
+
+    // Menu Mobile
+    const hamb = document.getElementById('hamb');
+    const menu = document.getElementById('menu');
+    hamb.addEventListener('click', () => menu.classList.toggle('active'));
+
+    document.addEventListener('DOMContentLoaded', onModeChange);
+</script>
+
+</body>
+</html>

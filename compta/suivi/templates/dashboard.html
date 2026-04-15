@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SalesPro</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #38bdf8;
+            --bg: #f0f4f8;
+            --white: #ffffff;
+            --text-main: #0f172a;
+            --text-sub: #64748b;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+        }
+
+        /* NAVBAR MODERNE */
+        header {
+            background: var(--primary);
+            padding: 0.7rem 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 { color: white; font-size: 1.2rem; letter-spacing: -0.5px; }
+
+        .nav-links { display: flex; gap: 8px; }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-size: 0.85rem;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover { background: var(--secondary); color: white; }
+
+        /* HAMBURGER */
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 4px; }
+        .hamburger span { width: 22px; height: 2px; background: white; border-radius: 2px; }
+
+        /* LAYOUT DU DASHBOARD */
+        .dashboard-wrapper {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1.5rem;
+        }
+
+        .page-title { margin-bottom: 2rem; }
+        .page-title h1 { font-size: 1.8rem; color: var(--primary); }
+
+        /* GRILLE DE FORMULAIRES */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid rgba(37, 99, 235, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1.2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ÉLÉMENTS DE FORMULAIRE */
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--text-sub); margin-bottom: 6px; }
+        
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: 0.2s;
+            background: #f8fafc;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 0.5rem;
+        }
+
+        button:hover { background: var(--secondary); }
+
+        /* RESPONSIVE */
+        @media (max-width: 850px) {
+            .hamburger { display: flex; }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%; left: 0; width: 100%;
+                background: var(--primary);
+                padding: 1rem;
+                box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            }
+            .nav-links.active { display: flex; }
+            .grid-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo"><h1>FINTECH</h1></div>
+        <div class="hamburger" id="hamb"><span></span><span></span><span></span></div>
+        <nav class="nav-links" id="menu">
+        <nav class="nav-links" id="menu">
+            {% if user.is_cadre %}
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'creer_utilisateur'%}">Utilisateur</a>
+                <a href="{% url 'modifier_statut' user.id %}">Statut</a>
+            {% endif %}
+        
+            <a href="{% url 'gestionstock' %}">Gestion stock</a>
+            
+           
+            {% if user.is_cadre or user.is_comptable %}
+                <a href="{% url 'rapport' %}">Rapport</a>
+                <a href="{% url 'dette' %}">Dette</a>
+                <a href="{% url 'detteinterne' %}">Dette interne</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<div class="dashboard-wrapper">
+    <div class="page-title">
+        <h1>Tableau de Bord</h1>
+    </div>
+
+    <div class="grid-container">
+        <!-- FORMULAIRE 1 : PRODUIT -->
+        <div class="card">
+            <h2>📦 Ajouter un produit</h2>
+            <form action="{% url 'produit' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Nom du produit</label>
+                    <input type="text" name="nom_produit" placeholder="Ex: Laptop Dell" required>
+                </div>
+                <div class="form-group">
+                    <label>Quantité initiale</label>
+                    <input type="number" name="quantite" placeholder="0" required>
+                </div>
+                <button type="submit">Ajouter au stock</button>
+            </form>
+        </div>
+
+        <!-- FORMULAIRE 2 : BUDGET -->
+        <div class="card">
+            <h2>💰 Définir un budget</h2>
+            <form action="{% url 'budget' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Libellé du budget</label>
+                    <input type="text" name="nom_budget" placeholder="Ex: Marketing Q3" required>
+                </div>
+                <div class="form-group">
+                    <label>Montant prévisionnel</label>
+                    <input type="number" name="montant_budget" step="0.01" placeholder="0.00 CFA" required>
+                </div>
+                <button type="submit">Valider le budget</button>
+            </form>
+        </div>
+
+        <!-- FORMULAIRE 3 : FOURNISSEUR -->
+        <div class="card">
+            <h2>🤝 Nouveau fournisseur</h2>
+            <form action="{% url 'fournisseur' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>Nom de l'entreprise</label>
+                    <input type="text" name="nom_fournisseur" placeholder="Ex: Global Tech SARL" required>
+                </div>
+                <button type="submit">Enregistrer fournisseur</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Menu mobile
+    const hamb = document.getElementById('hamb');
+    const menu = document.getElementById('menu');
+    hamb.addEventListener('click', () => menu.classList.toggle('active'));
+
+    // Fermeture auto si clic extérieur
+    document.addEventListener('click', (e) => {
+        if(!hamb.contains(e.target) && !menu.contains(e.target)) menu.classList.remove('active');
+    });
+</script>
+
+</body>
+</html>

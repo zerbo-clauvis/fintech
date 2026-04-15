@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FINTECH - Gestion de Stock</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --secondary: #38bdf8;
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text-main); line-height: 1.6; }
+
+        /* NAVBAR */
+        header { background: var(--primary); color: white; padding: 0.8rem 1.5rem; position: sticky; top: 0; z-index: 1000; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-weight: 900; font-size: 1.4rem; letter-spacing: 1px; }
+        .nav-links { display: flex; gap: 8px; }
+        .nav-links a { color: white; text-decoration: none; font-size: 0.8rem; padding: 8px 12px; border-radius: 6px; transition: 0.3s; background: rgba(255,255,255,0.05); }
+        .nav-links a:hover { background: var(--secondary); }
+        .hamburger { display: none; cursor: pointer; flex-direction: column; gap: 4px; }
+        .hamburger span { width: 22px; height: 2px; background: white; }
+
+        /* CONTENT */
+        .container { max-width: 1100px; margin: 2rem auto; padding: 0 1rem; }
+        .page-header { margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; }
+        .page-header h1 { font-size: 1.8rem; color: var(--primary); }
+
+        /* MESSAGES */
+        .messages { list-style: none; margin-bottom: 1.5rem; }
+        .messages li { padding: 12px; border-radius: 8px; margin-bottom: 8px; font-weight: 500; border-left: 5px solid; }
+        .success { background: #dcfce7; color: #166534; border-color: var(--success); }
+        .error { background: #fee2e2; color: #991b1b; border-color: #ef4444; }
+
+        /* CARDS & GRIDS */
+        .grid-stock { display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start; }
+        .card { background: var(--white); padding: 1.5rem; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .card h2 { font-size: 1.1rem; color: var(--primary); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 8px; }
+
+        /* TABLEAU */
+        .table-responsive { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: #f8fafc; text-align: left; padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: var(--text-sub); }
+        td { padding: 14px 12px; border-top: 1px solid var(--border); font-size: 0.95rem; }
+        .qty-badge { background: #e0f2fe; color: var(--primary); padding: 4px 10px; border-radius: 20px; font-weight: bold; }
+        .qty-low { background: #fee2e2; color: #ef4444; }
+
+        /* FORMS */
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: var(--text-sub); }
+        input, select { width: 100%; padding: 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.9rem; outline: none; transition: 0.2s; }
+        input:focus, select:focus { border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1); }
+        button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-secondary { background: #f1f5f9; color: var(--text-main); border: 1px solid var(--border); }
+        .btn-secondary:hover { background: var(--border); }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .grid-stock { grid-template-columns: 1fr; }
+            .hamburger { display: flex; }
+            .nav-links { display: none; flex-direction: column; position: absolute; top: 100%; left: 0; width: 100%; background: var(--primary); padding: 1rem; box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+            .nav-links.active { display: flex; }
+            .nav-links a { width: 100%; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="nav-container">
+        <div class="logo">FINTECH</div>
+        <div class="hamburger" id="hamb"><span></span><span></span><span></span></div>
+        <nav class="nav-links" id="menu">
+            {% if user.is_cadre  %}
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <a href="{% url 'creer_utilisateur'%}">Créer un utilisateur</a>
+                <a href="{% url 'modifier_statut' user.id %}">Gestion des rôles</a>
+            {% endif %}
+        
+            <a href="{% url 'gestionstock' %}">Gestion stock</a>
+            
+           
+            {% if user.is_cadre or user.is_comptable %}
+                <a href="{% url 'rapport' %}">Rapport</a>
+                <a href="{% url 'dette' %}">Dette</a>
+                <a href="{% url 'detteinterne' %}">Dette interne</a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    {% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <div class="page-header">
+        <h1>📦 Gestion de Stock</h1>
+    </div>
+
+    <div class="grid-stock">
+        <!-- LISTE DES PRODUITS -->
+        <div class="card">
+            <h2>Inventaire actuel</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nom du Produit</th>
+                            <th>État du Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produit in produits %}
+                        <tr>
+                            <td><strong>{{ produit.nom_produit }}</strong></td>
+                            <td>
+                                <span class="qty-badge {% if produit.quantite < 5 %}qty-low{% endif %}">
+                                    {{ produit.quantite }} unités
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="2" style="text-align: center; padding: 2rem;">Aucun produit en stock.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ACTIONS ADMIN -->
+        <div class="side-actions">
+            {% if user.is_comptable or user.is_cadre %}
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h2>➕ Nouveau Produit</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="create">
+                    <div class="form-group">
+                        <label>Désignation</label>
+                        <input type="text" name="nom_produit" placeholder="Ex: Ciment 50kg" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantité de départ</label>
+                        <input type="number" name="quantite" min="0" value="0" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Ajouter au catalogue</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>🔄 Mouvement de Stock</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update">
+                    <div class="form-group">
+                        <label>Sélectionner le produit</label>
+                        <select name="produit_id" required>
+                            <option value="">-- Choisir --</option>
+                            {% for produit in produits %}
+                                <option value="{{ produit.id }}">{{ produit.nom_produit }} (Dispo: {{ produit.quantite }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Variation (+ ou -)</label>
+                        <input type="number" name="quantite_ajout" placeholder="Ex: 10 ou -5" required>
+                        <p style="font-size: 0.7rem; color: var(--text-sub); margin-top: 5px;">
+                            Utilisez le signe <strong>-</strong> pour sortir du stock.
+                        </p>
+                    </div>
+                    <button type="submit" class="btn-secondary" style="border-color: var(--secondary); color: var(--primary);">Valider le mouvement</button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+    // Menu mobile toggle
+    const hamb = document.getElementById('hamb');
+    const menu = document.getElementById('menu');
+    hamb.addEventListener('click', () => menu.classList.toggle('active'));
+
+    // Fermer le menu au clic extérieur
+    document.addEventListener('click', (e) => {
+        if(!hamb.contains(e.target) && !menu.contains(e.target)) menu.classList.remove('active');
+    });
+</script>
+
+</body>
+</html>

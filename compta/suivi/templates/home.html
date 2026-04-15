@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finetech</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:#0f172a}
+
+/* NAVBAR */
+.navbar{
+position:fixed;top:0;width:100%;
+display:flex;justify-content:space-between;align-items:center;
+padding:1rem 6%;background:white;z-index:1000;
+box-shadow:0 5px 20px rgba(0,0,0,0.05);
+}
+
+.logo{font-weight:800;color:#2563eb;font-size:1.6rem}
+
+.nav-links{display:flex;gap:2rem}
+.nav-links a{text-decoration:none;color:#334155;font-weight:500}
+.nav-links a:hover{color:#2563eb}
+
+.menu-toggle{display:none;font-size:1.8rem;cursor:pointer;color:#2563eb}
+
+/* HERO */
+.hero{
+padding:8rem 6% 6rem;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+max-width:absolute;
+background:linear-gradient(135deg,#e0ecff,#f8fbff);
+}
+
+.hero h1{font-size:3rem;font-weight:800;margin-bottom:1rem}
+.hero span{color:#2563eb}
+.hero p{font-size:1.1rem;color:#475569;margin-bottom:2rem}
+
+.cta{
+background:linear-gradient(135deg,#2563eb,#38bdf8);
+color:white;
+padding:1rem 2rem;
+border-radius:40px;
+text-decoration:none;
+font-weight:600;
+width:fit-content;
+box-shadow:0 10px 25px rgba(37,99,235,0.3);
+}
+
+/* SECTIONS */
+section{padding:5rem 6%}
+
+.section-title{text-align:center;font-size:2rem;margin-bottom:1rem}
+.section-sub{text-align:center;color:#64748b;margin-bottom:3rem}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:2rem}
+
+.card{
+background:white;
+padding:2rem;
+border-radius:18px;
+border:1px solid #e2e8f0;
+transition:0.3s;
+}
+
+.card:hover{
+transform:translateY(-6px);
+box-shadow:0 15px 30px rgba(0,0,0,0.08)
+}
+
+.card i{font-size:2rem;color:#2563eb;margin-bottom:1rem}
+.card h3{margin-bottom:0.5rem}
+.card p{color:#475569;font-size:0.95rem}
+
+/* DIFFERENT BACKGROUNDS */
+#objectifs{
+background:white;
+}
+
+#features{
+background:linear-gradient(135deg,#eef4ff,#f8fbff);
+}
+
+/* SECTION SEPARATOR */
+.separator{
+height:80px;
+background:linear-gradient(to bottom, rgba(255,255,255,0), #eef4ff);
+}
+
+/* FOOTER */
+footer{
+background:#0f172a;
+color:white;
+padding:3rem 6%;
+text-align:center
+}
+
+/* MOBILE */
+@media(max-width:768px){
+.nav-links{
+position:absolute;
+top:70px;
+right:0;
+background:white;
+flex-direction:column;
+width:220px;
+padding:1rem;
+display:none;
+box-shadow:0 10px 20px rgba(0,0,0,0.1);
+}
+
+.nav-links.active{display:flex}
+.menu-toggle{display:block}
+.hero h1{font-size:2.2rem}
+}
+</style>
+</head>
+
+<body>
+
+<nav class="navbar">
+<div class="logo">FINETECH</div>
+
+<div class="menu-toggle" onclick="toggleMenu()">
+<i class="fas fa-bars"></i>
+</div>
+
+<div class="nav-links" id="menu">
+<a href="#home">Accueil</a>
+<a href="#objectifs">Objectifs</a>
+<a href="#features">Fonctionnalités</a>
+</div>
+</nav>
+
+<section class="hero" id="home">
+<h1>Gérez votre <span>entreprise</span> avec une solution financière intelligente</h1>
+<p>FINETECH vous aide à suivre vos finances, éviter les pertes et prendre de meilleures décisions grâce à des outils simples et puissants.</p>
+<a href="{% url 'entreprise' %}" class="cta">Démarrer gratuitement</a>
+</section>
+
+<div class="separator"></div>
+
+<section id="objectifs">
+<h2 class="section-title">Pourquoi utiliser FINETECH ?</h2>
+<p class="section-sub">Une solution pensée pour simplifier votre gestion au quotidien</p>
+
+<div class="grid">
+
+<div class="card">
+<i class="fas fa-check-circle"></i>
+<h3>Simplicité</h3>
+<p>Simplifiez la gestion financière quotidienne sans compétences comptables.</p>
+</div>
+
+<div class="card">
+<i class="fas fa-chart-line"></i>
+<h3>Visibilité</h3>
+<p>Obtenez une vision claire et instantanée de la santé financière de votre entreprise.</p>
+</div>
+
+<div class="card">
+<i class="fas fa-shield-alt"></i>
+<h3>Fiabilité</h3>
+<p>Réduisez les erreurs humaines grâce à l’automatisation des calculs.</p>
+</div>
+
+<div class="card">
+<i class="fas fa-exclamation-triangle"></i>
+<h3>Anticipation</h3>
+<p>Détectez les problèmes de trésorerie avant qu’ils ne deviennent critiques.</p>
+</div>
+
+</div>
+</section>
+
+<div class="separator"></div>
+
+<section id="features">
+<h2 class="section-title">Fonctionnalités clés</h2>
+<p class="section-sub">Tout ce dont vous avez besoin pour gérer efficacement votre activité</p>
+
+<div class="grid">
+
+<div class="card">
+<i class="fas fa-money-bill-wave"></i>
+<h3>Entrées & sorties</h3>
+<p>Enregistrez facilement toutes vos transactions financières.</p>
+</div>
+
+<div class="card">
+<i class="fas fa-chart-pie"></i>
+<h3>Tableau de bord</h3>
+<p>Suivez votre trésorerie en temps réel avec des indicateurs clairs.</p>
+</div>
+
+<div class="card">
+<i class="fas fa-file-invoice"></i>
+<h3>Dépenses & dettes</h3>
+<p>Gérez vos factures, dépenses et dettes en un seul endroit.</p>
+</div>
+
+<div class="card">
+<i class="fas fa-file-alt"></i>
+<h3>Rapports automatiques</h3>
+<p>Générez vos rapports journaliers et mensuels en un clic.</p>
+</div>
+
+<div class="card">
+<i class="fas fa-bell"></i>
+<h3>Alertes intelligentes</h3>
+<p>Recevez des alertes en cas de dépassement de budget ou baisse de trésorerie.</p>
+</div>
+
+<div class="card">
+<i class="fas fa-users-cog"></i>
+<h3>Gestion des employés</h3>
+<p>Créez des comptes avec des droits spécifiques selon le rôle : vendeur, comptable ou cadre.</p>
+</div>
+
+</div>
+</section>
+
+<footer>
+<p>© 2026 FINETECH - Solution de gestion financière moderne</p>
+</footer>
+
+<script>
+function toggleMenu(){
+let menu=document.getElementById('menu');
+menu.classList.toggle('active');
+}
+</script>
+
+</body>
+</html>
