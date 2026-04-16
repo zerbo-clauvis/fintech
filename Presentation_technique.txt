@@ -1,0 +1,33 @@
+                             Présentation technique
+
+Le logiciel est organisé de façon simple :
+        
+  [ UTILISATEUR ]
+        ↓
+[ INTERFACE WEB ]
+(Pages - Formulaires)
+        ↓
+[ - BACKEND ]
+(Views + Logique métier)
+        ↓
+[ MODELS ]
+(Traitement des données)
+        ↓
+[ BASE DE DONNÉES ]
+        
+                     
+Les technologie utiliser pour le projet sont : 
+Frontend:  Html - React - Js
+Backend:  python - django - Api Rest
+Base de donne: mysql 
+
+III - Guide d’installation et d'exécution
+
+Prérequis : 
+
+Avoir wampserver ou xamp ou tout autres equivalent
+installer:
+python 3.12
+django 6.0.3
+mysql 0.0.3
+mysqlclient 2.2.8

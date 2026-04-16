@@ -172,6 +172,13 @@ def produit(request):
         produit.save()     
     return render(request, 'dashboard.html')
 
+@user_passes_test( est_cadre)
+def supprimer_produit(request, produit_id):
+    produit = get_object_or_404(Produit, id=produit_id, entreprise=request.user.entreprise)
+    produit.delete()
+    messages.success(request, f"Produit '{produit.nom_produit}' supprimé avec succès.")
+    return redirect('gestionstock')
+
 def budget(request):
     if request.method == 'POST':
         nom_budget = request.POST.get('nom_budget')

@@ -20,5 +20,6 @@ urlpatterns = [
     path('rapport/', views.rapport, name='rapport'),
     path('modifier-statut/<int:user_id>/', views.modifier_statut, name='modifier_statut'),
     path('gestion-role/', views.gestion_roles, name='gestion_roles'),
+    path('supprimer-produit/<int:produit_id>/', views.supprimer_produit, name='supprimer_produit'),
     path('', views.home, name='home'),
 ]

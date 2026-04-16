@@ -126,7 +126,8 @@
             {% endif %}
         
             <a href="{% url 'gestionstock' %}">Gestion stock</a>
-            
+            <a href="{% url 'vente' %}">Ventes</a>
+           
            
             {% if user.is_cadre or user.is_comptable %}
                 <a href="{% url 'rapport' %}">Rapport</a>
